@@ -12,27 +12,33 @@ const authOptions = {
     async jwt({ token, account, profile }) {
       if (account) {
         token.accessToken = account.access_token;
-        
-        // Ensure account.expires_in is valid
-        const expiresIn = account.expires_in ? account.expires_in * 1000 : 0;
-        token.accessTokenExpires = Date.now() + expiresIn;
-
+        token.accessTokenExpires = Date.now() + account.expires_in * 1000;
         token.refreshToken = account.refresh_token;
-        token.picture = profile.picture;
+        token.picture = profile.picture; // Store the profile picture URL
+
+        console.log('Token set:', {
+          accessToken: token.accessToken,
+          accessTokenExpires: token.accessTokenExpires,
+          refreshToken: token.refreshToken,
+          picture: token.picture, // Log the profile picture URL
+        });
       }
 
-      // Ensure the accessTokenExpires is a valid timestamp
-      if (token.accessTokenExpires && Date.now() < token.accessTokenExpires) {
+      if (Date.now() < token.accessTokenExpires) {
+        console.log('Token is valid:', {
+          accessToken: token.accessToken,
+          accessTokenExpires: token.accessTokenExpires,
+        });
         return token;
       }
 
-      // Refresh token if expired
+      console.log('Token expired, refreshing...');
       return refreshAccessToken(token);
     },
     async session({ session, token }) {
       session.accessToken = token.accessToken;
       session.error = token.error;
-      session.user.picture = token.picture;
+      session.user.picture = token.picture; // Include the profile picture URL in the session
       return session;
     },
   },
@@ -40,7 +46,7 @@ const authOptions = {
 
 async function refreshAccessToken(token) {
   try {
-    const url = `https://oauth2.googleapis.com/token?client_id=${process.env.GOOGLE_CLIENT_ID}&client_secret=${process.env.GOOGLE_CLIENT_SECRET}&grant_type=refresh_token&refresh_token=${token.refreshToken}`;
+    const url = https://oauth2.googleapis.com/token?client_id=${process.env.GOOGLE_CLIENT_ID}&client_secret=${process.env.GOOGLE_CLIENT_SECRET}&grant_type=refresh_token&refresh_token=${token.refreshToken};
 
     const response = await fetch(url, {
       headers: {
@@ -55,14 +61,14 @@ async function refreshAccessToken(token) {
       throw refreshedTokens;
     }
 
-    const newExpiresIn = refreshedTokens.expires_in ? refreshedTokens.expires_in * 1000 : 0;
+    console.log('Refreshed tokens:', refreshedTokens);
 
     return {
       ...token,
       accessToken: refreshedTokens.access_token,
-      accessTokenExpires: Date.now() + newExpiresIn,
+      accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
       refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
-      picture: token.picture,
+      picture: token.picture, // Ensure the profile picture URL is retained
     };
   } catch (error) {
     console.error('Error refreshing access token', error);

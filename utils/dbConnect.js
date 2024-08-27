@@ -7,6 +7,8 @@ if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
 }
 
+console.log('MONGODB_URI:', MONGODB_URI); // Log the connection string
+
 let cached = global.mongoose;
 
 if (!cached) {
@@ -15,6 +17,7 @@ if (!cached) {
 
 async function dbConnect() {
   if (cached.conn) {
+    console.log('Using cached connection');
     return cached.conn;
   }
 
@@ -24,8 +27,11 @@ async function dbConnect() {
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log('MongoDB connected'); // Add this line
+      console.log('MongoDB connected'); // Log successful connection
       return mongoose;
+    }).catch((error) => {
+      console.error('MongoDB connection error:', error); // Log connection error
+      throw error;
     });
   }
 

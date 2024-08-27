@@ -63,7 +63,7 @@ const Navbar = () => {
                   <Link href="/create" legacyBehavior>
                     <a className="block px-4 py-2 text-gray-800 hover:bg-gray-200" onClick={handleDropdownClick}>Create Prompt</a>
                   </Link>
-                  <button className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200" onClick={() => { handleDropdownClick(); signOut(); }}>
+                  <button className="block w-full  px-4 py-2 text-gray-800 hover:bg-gray-200" onClick={() => { handleDropdownClick(); signOut(); }}>
                     Sign Out
                   </button>
                 </div>

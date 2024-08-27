@@ -13,6 +13,7 @@ const SignIn = () => {
     if (session) {
       // Call the API to add the user to the database
       const addUser = async () => {
+        console.log('Making POST request to /api/addUser'); // Add this line
         const response = await fetch('/api/addUser', {
           method: 'POST',
           headers: {
