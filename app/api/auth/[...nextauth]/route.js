@@ -14,7 +14,7 @@ const authOptions = {
         token.accessToken = account.access_token;
         token.accessTokenExpires = Date.now() + account.expires_in * 1000;
         token.refreshToken = account.refresh_token;
-        token.picture = profile.picture; // Store the profile picture URL
+        token.picture = profile.picture; 
 
         console.log('Token set:', {
           accessToken: token.accessToken,
