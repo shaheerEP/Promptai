@@ -1,22 +1,21 @@
-// models/User.js
-import mongoose from 'mongoose';
+import { Schema, model, models } from 'mongoose';
 
-const UserSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "Username is required!"],
-    
-   
-  },
+const UserSchema = new Schema({
   email: {
     type: String,
-    required: [true, "Email is required!"],
-    unique: [true, "Email already exist!"]
+    unique: [true, 'Email already exists!'],
+    required: [true, 'Email is required!'],
+  },
+  username: {
+    type: String,
+    required: [true, 'Username is required!'],
+    match: [/^[a-zA-Z0-9._]+$/, "Username should contain only alphanumeric characters, dots, and underscores!"]
   },
   image: {
     type: String,
-    required: true,
-  }, 
+  }
 });
 
-export default mongoose.models.User || mongoose.model('User', UserSchema);
+const User = models.User || model("User", UserSchema);
+
+export default User;
