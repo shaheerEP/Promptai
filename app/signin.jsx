@@ -1,57 +1,55 @@
-// app/signin.jsx
 'use client';
 
 import { signIn, useSession } from 'next-auth/react';
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 const SignIn = () => {
-  const { data: session, status } = useSession();
   const router = useRouter();
+  const { data: session, status } = useSession();
+  const searchParams = useSearchParams();
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    if (session) {
-      // Call the API to add the user to the database
-      const addUser = async () => {
-        console.log('Making POST request to /api/addUser'); // Add this line
-        const response = await fetch('/api/addUser', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            name: session.user.name,
-            email: session.user.email,
-            image: session.user.image,
-          }),
-        });
-
-        const data = await response.json();
-        if (data.success) {
-          console.log('User added successfully:', data.data);
-        } else {
-          console.error('Error adding user:', data.error);
-        }
-      };
-
-      addUser();
+    if (status === 'authenticated') {
       router.push('/');
     }
-  }, [session, router]);
+
+    const errorMessage = searchParams.get('error');
+    if (errorMessage) {
+      setError('An error occurred during sign in. Please try again.');
+    }
+  }, [status, router, searchParams]);
+
+  const handleSignIn = async () => {
+    try {
+      const result = await signIn('google', { callbackUrl: '/' });
+      if (result?.error) {
+        setError('An error occurred during sign in. Please try again.');
+        console.error('Sign in error:', result.error);
+      }
+    } catch (error) {
+      setError('An error occurred during sign in. Please try again.');
+      console.error('Sign in error:', error);
+    }
+  };
 
   if (status === 'loading') {
-    return <p>Loading...</p>;
+    return <div>Loading...</div>;
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <h1 className="text-2xl font-bold">Sign In</h1>
-      <button
-        onClick={() => signIn('google')}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
-      >
-        Sign in with Google
-      </button>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <div className="p-8 bg-white rounded shadow-md">
+        <h1 className="text-2xl font-bold mb-4">Sign In</h1>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+        <button
+          onClick={handleSignIn}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+        >
+          Sign in with Google
+        </button>
+      </div>
     </div>
   );
 };

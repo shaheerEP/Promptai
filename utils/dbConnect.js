@@ -1,42 +1,26 @@
-// utils/dbConnect.js
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGO_URI;
+let isConnected = false; // track the connection
 
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+export const connectToDB = async () => {
+  mongoose.set('strictQuery', true);
+
+  if (isConnected) {
+    console.log('MongoDB is already connected');
+    return;
 }
 
-console.log('MONGODB_URI:', MONGODB_URI); // Log the connection string
+try {
+  await mongoose.connect(process.env.MONGODB_URI, {
+    dbName: "Promptai",
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
 
-let cached = global.mongoose;
+  isConnected = true;
 
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
-}
+  console.log('MongoDB connected');
+} catch (error) {
+  console.log(error);   
 
-async function dbConnect() {
-  if (cached.conn) {
-    console.log('Using cached connection');
-    return cached.conn;
-  }
-
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log('MongoDB connected'); // Log successful connection
-      return mongoose;
-    }).catch((error) => {
-      console.error('MongoDB connection error:', error); // Log connection error
-      throw error;
-    });
-  }
-
-  cached.conn = await cached.promise;
-  return cached.conn;
-}
-
-export default dbConnect;
+}}
