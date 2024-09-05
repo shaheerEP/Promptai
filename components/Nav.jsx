@@ -63,7 +63,8 @@ const Navbar = () => {
                 className="flex items-center focus:outline-none"
               >
                 <img
-                  src={session.user.image || '/assets/images/user.png'}
+                    src={session.user.image || '/assets/images/profile.png'}
+                    
                   alt="Profile"
                   className="h-10 w-10 rounded-full"
                 />
