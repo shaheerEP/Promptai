@@ -1,48 +1,48 @@
-'use client';
+'use client'
 
-import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
-import { useSession, signOut, signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
+import { useSession, signOut, signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 
 const Navbar = () => {
-  const { data: session, status } = useSession();
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
-  const router = useRouter();
+  const { data: session, status } = useSession()
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const dropdownRef = useRef(null)
+  const router = useRouter()
 
-  const handleDropdownClick = () => setDropdownOpen(false);
+  const handleDropdownClick = () => setDropdownOpen(false)
 
   const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setDropdownOpen(false);
+      setDropdownOpen(false)
     }
-  };
+  }
 
   useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const handleSignOut = async () => {
-    await signOut({ redirect: false });
-    
+    await signOut({ redirect: false })
+
     // Clear all cookies
-    document.cookie.split(";").forEach((c) => {
+    document.cookie.split(';').forEach((c) => {
       document.cookie = c
-        .replace(/^ +/, "")
-        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-    });
+        .replace(/^ +/, '')
+        .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/')
+    })
 
     // Clear localStorage
-    localStorage.clear();
+    localStorage.clear()
 
     // Clear sessionStorage
-    sessionStorage.clear();
+    sessionStorage.clear()
 
     // Perform a hard reload of the page
-    window.location.href = '/';
-  };
+    window.location.href = '/'
+  }
 
   return (
     <nav className="bg-white shadow-md p-4 flex justify-between items-center relative">
@@ -50,11 +50,14 @@ const Navbar = () => {
         <img src="/assets/images/logo.svg" alt="Logo" className="h-8 w-8" />
         <span className="hidden md:block ml-2 text-xl font-bold">Promptai</span>
       </Link>
-      
+
       <div className="flex items-center space-x-4">
         {status === 'loading' ? null : session ? (
           <>
-            <Link href="/create" className="hidden md:block px-4 py-2 bg-black text-white rounded">
+            <Link
+              href="/create-prompt"
+              className="hidden md:block px-4 py-2 bg-black text-white rounded"
+            >
               Create Prompt
             </Link>
             <div className="relative">
@@ -63,24 +66,37 @@ const Navbar = () => {
                 className="flex items-center focus:outline-none"
               >
                 <img
-                    src={session.user.image || '/assets/images/profile.png'}
-                    
+                  src={session.user.image || '/assets/images/profile.png'}
                   alt="Profile"
                   className="h-10 w-10 rounded-full"
                 />
               </button>
               {dropdownOpen && (
-                <div ref={dropdownRef} className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50">
-                  <Link href="/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-200" onClick={handleDropdownClick}>
+                <div
+                  ref={dropdownRef}
+                  className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50"
+                >
+                  <Link
+                    href="/profile"
+                    className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                    onClick={handleDropdownClick}
+                  >
                     My Profile
                   </Link>
-                  <Link href="/create" className="block px-4 py-2 text-gray-800 hover:bg-gray-200 md:hidden" onClick={handleDropdownClick}>
+                  <Link
+                    href="/create-prompt"
+                    className="block px-4 py-2 text-gray-800 hover:bg-gray-200 md:hidden"
+                    onClick={handleDropdownClick}
+                  >
                     Create Prompt
                   </Link>
                   {session && (
-                    <button 
-                      className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200" 
-                      onClick={() => { handleDropdownClick(); handleSignOut(); }}
+                    <button
+                      className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200"
+                      onClick={() => {
+                        handleDropdownClick()
+                        handleSignOut()
+                      }}
                     >
                       Sign Out
                     </button>
@@ -99,7 +115,7 @@ const Navbar = () => {
         )}
       </div>
     </nav>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default Navbar
